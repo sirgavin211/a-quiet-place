@@ -1,0 +1,148 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Sparkles } from 'lucide-react';
+
+const animals = ['🐇', '🐿️', '🦊', '🦋', '🐦', '🐱'];
+
+const Animal = ({ emoji, id }) => {
+    const [position, setPosition] = useState({
+        x: Math.random() * 80,
+        y: Math.random() * 80,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3
+    });
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setPosition(prev => {
+                let newX = prev.x + prev.vx;
+                let newY = prev.y + prev.vy;
+                let newVx = prev.vx;
+                let newVy = prev.vy;
+
+                if (newX <= 0 || newX >= 95) newVx = -prev.vx;
+                if (newY <= 0 || newY >= 90) newVy = -prev.vy;
+
+                return {
+                    x: Math.max(0, Math.min(95, newX)),
+                    y: Math.max(0, Math.min(90, newY)),
+                    vx: newVx,
+                    vy: newVy
+                };
+            });
+        }, 50);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div
+            className="absolute text-2xl transition-all duration-100 pointer-events-none"
+            style={{
+                left: `${position.x}%`,
+                top: `${position.y}%`,
+                transform: `scaleX(${position.vx > 0 ? 1 : -1})`
+            }}
+        >
+            {emoji}
+        </div>
+    );
+};
+
+export default function ChatWithGod() {
+    const [messages, setMessages] = useState([]);
+    const [input, setInput] = useState('');
+    const messagesEndRef = useRef(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    const handleSend = () => {
+        if (!input.trim()) return;
+
+        const userMessage = input.trim();
+        setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+        setInput('');
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    };
+
+    return (
+        <div className="h-screen w-screen bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 relative overflow-hidden fixed inset-0">
+            {/* Wandering animals */}
+            {animals.map((animal, i) => (
+                <Animal key={i} emoji={animal} id={i} />
+            ))}
+
+            {/* Main chat container */}
+            <div className="relative z-10 max-w-3xl mx-auto p-6 h-full flex flex-col">
+                {/* Header */}
+                <div className="text-center mb-8 mt-8">
+                    <div className="text-6xl mb-4">☁️</div>
+                    <h1 className="text-4xl font-serif text-amber-900 mb-2">A Quiet Place</h1>
+                    <p className="text-amber-700 text-sm">Speak what's in your heart</p>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 mb-6 space-y-4 overflow-y-auto overflow-x-hidden">
+                    {messages.length === 0 && (
+                        <div className="text-center text-amber-600 italic mt-20">
+                            God is listening...
+                        </div>
+                    )}
+
+                    {messages.map((msg, idx) => (
+                        <div key={idx} className="flex justify-end">
+                            <div className="max-w-md px-6 py-4 rounded-3xl shadow-lg bg-amber-200 text-amber-900">
+                                <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                            </div>
+                        </div>
+                    ))}
+
+                    <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input */}
+                <div className="bg-white rounded-full shadow-2xl p-2 flex items-center gap-2 border-2 border-amber-300">
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder="Share what's on your mind..."
+                        className="flex-1 px-6 py-3 bg-transparent outline-none text-amber-900 placeholder-amber-400"
+                    />
+                    <button
+                        onClick={handleSend}
+                        disabled={!input.trim()}
+                        className="bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded-full p-3 transition-colors"
+                    >
+                        <Send size={20} />
+                    </button>
+                </div>
+            </div>
+
+            {/* Decorative elements */}
+            <div className="fixed top-10 left-10 text-4xl opacity-30 pointer-events-none">🌿</div>
+            <div className="fixed top-20 right-20 text-3xl opacity-30 pointer-events-none">🌸</div>
+            <div className="fixed bottom-20 left-20 text-3xl opacity-30 pointer-events-none">🍃</div>
+            <div className="fixed bottom-10 right-10 text-4xl opacity-30 pointer-events-none">🌻</div>
+        </div>
+    );
+}
