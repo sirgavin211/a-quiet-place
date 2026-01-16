@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 const animals = ['🐇', '🐿️', '🦊', '🦋', '🐦', '🐱'];
 
-const Animal = ({ emoji, id }) => {
+const Animal = ({ emoji }) => {
     const [position, setPosition] = useState({
-        x: Math.random() * 80,
-        y: Math.random() * 80,
+        x: Math.random() * 85,
+        y: Math.random() * 85,
         vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3
     });
@@ -36,7 +36,7 @@ const Animal = ({ emoji, id }) => {
 
     return (
         <div
-            className="absolute text-2xl transition-all duration-100 pointer-events-none"
+            className="absolute text-3xl transition-all duration-300 ease-linear opacity-90 pointer-events-none select-none"
             style={{
                 left: `${position.x}%`,
                 top: `${position.y}%`,
@@ -58,13 +58,6 @@ export default function ChatWithGod() {
     };
 
     useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
-    }, []);
-
-    useEffect(() => {
         scrollToBottom();
     }, [messages]);
 
@@ -84,23 +77,26 @@ export default function ChatWithGod() {
     };
 
     return (
-        <div className="h-screen w-screen bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 relative overflow-hidden fixed inset-0">
-            {/* Wandering animals */}
+        <div className="h-screen w-screen bg-gradient-to-br from-[#FFF3D6] via-[#FFEEC5] to-[#FFF8D7] relative overflow-hidden">
+
+            {/* Floating animals */}
             {animals.map((animal, i) => (
-                <Animal key={i} emoji={animal} id={i} />
+                <Animal key={i} emoji={animal} />
             ))}
 
-            {/* Main chat container */}
-            <div className="relative z-10 max-w-3xl mx-auto p-6 h-full flex flex-col">
+            {/* Main layout */}
+            <div className="relative z-10 h-full flex flex-col items-center px-6">
+
                 {/* Header */}
-                <div className="text-center mb-8 mt-8">
-                    <div className="text-6xl mb-4">☁️</div>
-                    <h1 className="text-4xl font-serif text-amber-900 mb-2">A Quiet Place</h1>
-                    <p className="text-amber-700 text-sm">Speak what's in your heart</p>
+                <div className="text-center mt-10 mb-6">
+                    <div className="text-6xl opacity-80 mb-3">☁️</div>
+                    <h1 className="text-5xl font-serif text-amber-900 mb-1">A Quiet Place</h1>
+                    <p className="text-amber-700 text-sm italic">Speak what's in your heart</p>
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 mb-6 space-y-4 overflow-y-auto overflow-x-hidden">
+                <div className="flex-1 w-full max-w-3xl mb-6 space-y-4 overflow-y-auto mt-4">
+
                     {messages.length === 0 && (
                         <div className="text-center text-amber-600 italic mt-20">
                             God is listening...
@@ -118,23 +114,25 @@ export default function ChatWithGod() {
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input */}
-                <div className="bg-white rounded-full shadow-2xl p-2 flex items-center gap-2 border-2 border-amber-300">
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Share what's on your mind..."
-                        className="flex-1 px-6 py-3 bg-transparent outline-none text-amber-900 placeholder-amber-400"
-                    />
-                    <button
-                        onClick={handleSend}
-                        disabled={!input.trim()}
-                        className="bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded-full p-3 transition-colors"
-                    >
-                        <Send size={20} />
-                    </button>
+                {/* Input centered */}
+                <div className="w-full flex justify-center mb-10">
+                    <div className="bg-white rounded-full shadow-2xl border-2 border-amber-300 p-2 flex items-center gap-2 w-full max-w-3xl">
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            placeholder="Share what's on your mind..."
+                            className="flex-1 px-6 py-3 bg-transparent outline-none text-amber-900 placeholder-amber-400"
+                        />
+                        <button
+                            onClick={handleSend}
+                            disabled={!input.trim()}
+                            className="bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white rounded-full p-3 transition"
+                        >
+                            <Send size={20} />
+                        </button>
+                    </div>
                 </div>
             </div>
 
